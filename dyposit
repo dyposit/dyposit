@@ -1,0 +1,60 @@
+#! /bin/bash
+# Script for interacting with Dyposits
+set -euo pipefail
+
+server=localhost
+port=8080
+
+function dyposit_help {
+    1>&2 printf '%s: Interact with DYPOSIT\n' "$(basename "$0")"
+    1>&2 printf '\nUsage: %s COMMAND [ARGS]\n' "${0}"
+    1>&2 printf '\nCommands:\n'
+    1>&2 printf '  help                       show this message.\n'
+    1>&2 printf '  permit PRINCIPAL ACTION    check if a PRINCIPAL permits an ACTION\n'
+    1>&2 printf '  assert FACT                add a fact to the database\n'
+    1>&2 printf '  retract FACT               remove a fact from the database\n'
+}
+
+function dyposit_permit {
+    principal="$(tr A-Z a-z <<<"${1:?principal}")"
+    action="$(tr A-Z a-z <<<"${2:?action}")"
+    curl --data-urlencode "principal=${principal}" \
+	 --data-urlencode "action=${action}" \
+	 "${server}:${port}/permit"
+}
+
+function dyposit_assert {
+    fact="${1:?fact}"
+    curl --data-urlencode "that=${fact}" \
+	 "${server}:${port}/assert"
+}
+
+function dyposit_retract {
+    fact="${1:?fact}"
+    curl --data-urlencode "that=${fact}" \
+	 "${server}:${port}/retract"
+}
+
+# Script begins here
+if [[ ${#} -lt 1 ]]; then
+    dyposit_help
+    exit 1
+fi
+
+case "${1}" in
+    'permit')
+	dyposit_permit "${2:?principal}" "${3:?action}"
+	;;
+
+    'assert')
+	dyposit_assert "${2:?asserted statement}"
+	;;
+
+    'retract')
+	dyposit_retract "${2:?retracted statement}"
+	;;
+    
+    'help' | '-h' | '--help' | '/?' | *)
+	dyposit_help
+	;;
+esac
