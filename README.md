@@ -1,7 +1,7 @@
 # DYPOSIT Policy Framework
 
 Code implementing framework described in the 
-[*Beware the Judderman, my dear*](https://www.youtube.com/watch?v=yovNUABeCrU)
+_Threat-Centered Dynamic Policies for CPI_
 paper.
 
 Two policies are supplied for you to play with, as well as a rudimentary server
